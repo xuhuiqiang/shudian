@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html ng-app="zfpxMod">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/2/bootstrap.css"/>
+</head>
+<body ng-controller="bookCtrl">
+ <table class="table table-responsive">
+     <tr>
+         <td>ID</td>
+         <td>名称</td>
+     </tr>
+     <tr ng-repeat="book in books">
+         <td>{{book.id}}</td>
+         <td>{{book.name}}</td>
+     </tr>
+ </table>
+<table>
+    <tr>
+        <td><input type="text" class="form-control" ng-model="book.name"/></td>
+        <td><button class="btn btn-default" ng-class="add()">增加</button>
+        </td>
+    </tr>
+</table>
+</body>
+<script src="/2/angular.js"></script>
+<script src="/resource/angular-resource.js"></script>
+
+<script>
+    angular.module('zfpxMod',['ngResource']);
+    //定义一个服务，他可以与后端的接口交互
+    angular.module('zfpxMod').factory('bookService', function ($resource) {
+        return $resource('/books/:id');
+    });
+    //定义控制器，注入服务
+    angular.module('zfpxMod').controller('bookCtrl', function ($scope,bookService) {
+        //当调用query的时候，其实是通过$http向后端的接口/books发起请求，然后把响应结果赋给$scope.books
+        $scope.book={};
+        $scope.books=bookService.query();
+        $scope.add= function () {
+            bookService.save($scope.book).$promise.then(function (result) {
+                $scope.books.push(result);
+                $scope.book={};
+            });
+        }
+
+
+    })
+
+</script>
+</html>
